@@ -1,6 +1,7 @@
 package com.example.ui.viewmodel
 
 import android.app.Application
+import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,6 +16,14 @@ import kotlinx.coroutines.launch
 class WebAppViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository: WebAppRepository
+    private val prefs = application.getSharedPreferences("app_settings", Context.MODE_PRIVATE)
+
+    val gridColumns = MutableStateFlow(prefs.getInt("grid_columns", 4))
+
+    fun setGridColumns(cols: Int) {
+        gridColumns.value = cols
+        prefs.edit().putInt("grid_columns", cols).apply()
+    }
 
     val searchQuery = MutableStateFlow("")
     val selectedCategory = MutableStateFlow("همه")
@@ -27,11 +36,23 @@ class WebAppViewModel(application: Application) : AndroidViewModel(application) 
 
     val filteredWebApps: StateFlow<List<WebAppEntity>>
 
+    val suggestedWebApps: StateFlow<List<WebAppEntity>>
+
     init {
         val database = AppDatabase.getDatabase(application)
         repository = WebAppRepository(application, database.webAppDao())
 
         allWebApps = repository.allWebApps.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
+        suggestedWebApps = allWebApps.map { apps ->
+            apps.filter { it.launchCount > 0 }
+                .sortedByDescending { it.launchCount }
+                .take(6)
+        }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
@@ -107,6 +128,12 @@ class WebAppViewModel(application: Application) : AndroidViewModel(application) 
     fun toggleFavorite(app: WebAppEntity) {
         viewModelScope.launch {
             repository.updateFavorite(app.id, !app.isFavorite)
+        }
+    }
+
+    fun incrementLaunchCount(appId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.incrementLaunchCount(appId)
         }
     }
 

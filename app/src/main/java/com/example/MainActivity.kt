@@ -50,6 +50,7 @@ fun AppNavigation() {
             DashboardScreen(
                 viewModel = viewModel,
                 onLaunchApp = { appId ->
+                    viewModel.incrementLaunchCount(appId)
                     navController.navigate("webrunner/$appId")
                 }
             )

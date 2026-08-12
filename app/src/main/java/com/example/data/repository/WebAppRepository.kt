@@ -41,6 +41,10 @@ class WebAppRepository(
         webAppDao.updateFavorite(id, isFav)
     }
 
+    suspend fun incrementLaunchCount(id: String) {
+        webAppDao.incrementLaunchCount(id)
+    }
+
     suspend fun checkAndCreateDefaultSamples() = withContext(Dispatchers.IO) {
         if (webAppDao.getCount() == 0) {
             val defaultSamples = SampleWebApps.createDefaultSamples(context)

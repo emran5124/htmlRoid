@@ -33,5 +33,6 @@ data class WebAppEntity(
     val forceDarkMode: Boolean = false,
     val allowGeolocation: Boolean = false,
     val allowCamera: Boolean = false,
-    val allowMicrophone: Boolean = false
+    val allowMicrophone: Boolean = false,
+    val launchCount: Int = 0
 )

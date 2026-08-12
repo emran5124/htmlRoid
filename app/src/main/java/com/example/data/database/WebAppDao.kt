@@ -29,6 +29,9 @@ interface WebAppDao {
     @Query("UPDATE web_apps SET isFavorite = :isFav WHERE id = :id")
     suspend fun updateFavorite(id: String, isFav: Boolean)
 
+    @Query("UPDATE web_apps SET launchCount = launchCount + 1, lastOpenedAt = :timestamp WHERE id = :id")
+    suspend fun incrementLaunchCount(id: String, timestamp: Long = System.currentTimeMillis())
+
     @Query("SELECT COUNT(*) FROM web_apps")
     suspend fun getCount(): Int
 }
