@@ -1,0 +1,6 @@
+{
+  "name": "HTML App Runner",
+  "description": "Web app launcher and isolated HTML project runner with offline support, per-app sandbox, permission controls, and real-time state persistence.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
